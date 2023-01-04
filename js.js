@@ -1,12 +1,9 @@
 let selectIndex = 1;
 
 const cardContainer = document.querySelector(".cards");
-const book2 = new Book("d", "d", "2", false);
 const addBookBtn = document.querySelector("#bookBtn");
 const overlay = document.querySelector(".overlay");
 const form = document.querySelector("form");
-const submitBtn = document.getElementById("submit");
-const readBtn = document.getElementById("read");
 
 // book object
 function Book(title, author, pages, read) {
@@ -42,6 +39,8 @@ Book.prototype.displayBook = function () {
   div.classList.add("card");
   div.setAttribute("data-index", `${selectIndex++}`);
   read.setAttribute("id", "read");
+  read.addEventListener('click', changeRead);
+  read.setAttribute("data-title", `${this.title}`);
   remove.setAttribute("id", "remove");
   remove.setAttribute("data-title", `${this.title}`);
   remove.addEventListener("click", removeBtn);
@@ -104,11 +103,16 @@ const getBookFromInput = () => {
   return book;
 };
 
-function removeBtn(e) {
+function changeRead(e){
   const bookTitle = `${e.target.dataset.title}`;
   console.log(bookTitle);
-  const book = library.getBook(bookTitle);
+  let book = library.getBook(bookTitle);
   console.log(book);
+  book.toggleRead();
+  library.displayLibrary();
+}
+function removeBtn(e) {
+  const bookTitle = `${e.target.dataset.title}`;
   library.removeBook(bookTitle);
   library.displayLibrary();
 }
@@ -121,8 +125,7 @@ function submitBook(e) {
 const clearCards = () => {
   cardContainer.innerHTML = "";
 };
-const hi = document.querySelector(`[data-index= '${1}']`);
-submitBtn.addEventListener("click", submitBook);
+form.onsubmit = submitBook;
 addBookBtn.onclick = () => {
   overlay.classList.add("active");
   form.classList.add("active");
