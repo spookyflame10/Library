@@ -1,19 +1,14 @@
-const myLibrary = [];
 let selectIndex = 1;
 
 const cardContainer = document.querySelector(".cards");
-// const book = new Book("d", "d", "2", false);
+const book2 = new Book("d", "d", "2", false);
 const addBookBtn = document.querySelector("#bookBtn");
 const overlay = document.querySelector(".overlay");
 const form = document.querySelector("form");
 const submitBtn = document.getElementById("submit");
 const readBtn = document.getElementById("read");
 
-function toggleRead(e) {
-  readBtn.textContent = "Not Read";
-}
-readBtn.addEventListener("click", toggleRead);
-
+// book object
 function Book(title, author, pages, read) {
   this.title = title;
   this.author = author;
@@ -26,15 +21,69 @@ function Book(title, author, pages, read) {
 Book.prototype.toggleRead = function () {
   this.read = !this.read;
 };
-const getBookFromInput = () => {
-  const title = document.getElementById("title").value;
-  const author = document.getElementById("author").value;
-  const pages = document.getElementById("pages").value;
-  const read = document.getElementById("read").checked;
-  const book = new Book(title, author, pages, read);
-  console.log(book);
-  return book;
+Book.prototype.displayBook = function () {
+  const div = document.createElement("div");
+  const title = document.createElement("div");
+  const author = document.createElement("div");
+  const pages = document.createElement("div");
+  const isRead = document.createElement("div");
+  const button = document.createElement("div");
+  const read = document.createElement("button");
+  const remove = document.createElement("button");
+
+  title.textContent = `${this.title}`;
+  author.textContent = `${this.author}`;
+  pages.textContent = `${this.pages}`;
+  isRead.textContent = `${this.read}`;
+  read.textContent = "Read";
+  remove.textContent = "Remove";
+
+  button.classList.add("button");
+  div.classList.add("card");
+  div.setAttribute("data-index", `${selectIndex++}`);
+  read.setAttribute("id", "read");
+  remove.setAttribute("id", "remove");
+  remove.setAttribute("data-title", `${this.title}`);
+  remove.addEventListener("click", removeBtn);
+
+  cardContainer.appendChild(div);
+  div.appendChild(title);
+  div.appendChild(author);
+  div.appendChild(pages);
+  div.appendChild(isRead);
+  div.appendChild(button);
+  button.appendChild(read);
+  button.appendChild(remove);
 };
+
+function Library() {
+  this.books = [];
+}
+Library.prototype.getBook = function (bookTitle) {
+  return this.books.find((book) => book.title === bookTitle);
+};
+Library.prototype.addBook = function (newBook) {
+  if (this.inLibrary(newBook)) {
+    alert("already in library");
+    return false;
+  }
+  this.books.push(newBook);
+  return true;
+};
+Library.prototype.removeBook = function (title) {
+  this.books = this.books.filter((book) => book.title !== title);
+  console.log(this.books);
+};
+Library.prototype.inLibrary = function (newBook) {
+  return this.books.some((book) => newBook.title === book.title);
+};
+Library.prototype.displayLibrary = function () {
+  clearCards();
+  this.books.forEach((book) => book.displayBook());
+};
+
+const library = new Library();
+
 function removeActive() {
   overlay.classList.remove("active");
   form.classList.remove("active");
@@ -45,46 +94,33 @@ window.onclick = function (event) {
   }
 };
 
-function addBookToLibrary(book) {
-  myLibrary.push(book);
-}
-// function displayLibrary() {
-//   for (const book in myLibrary) {
-//     displayBook(book);
-//   }
-// }
-function displayBook(book) {
-  const div = document.createElement("div");
-  div.classList.add("card");
-  div.setAttribute("data-index", `${selectIndex++}`);
-  div.innerHTML = `<div>${book.title}</div>
-    <div>${book.author}</div>
-    <div>${book.pages}</div>
-    <div>${book.read}</div>
-    <div class = "buttons">
-        <button id = 'read'>Read</button>
-        <button id = 'remove'>Remove</button>
-    </div>`;
-  console.log(div);
-  cardContainer.appendChild(div);
-}
-// displayBook(book);
+const getBookFromInput = () => {
+  const title = document.getElementById("title").value;
+  const author = document.getElementById("author").value;
+  const pages = document.getElementById("pages").value;
+  const read = document.getElementById("read").checked;
+  const book = new Book(title, author, pages, read);
+  console.log(book);
+  return book;
+};
 
 function removeBtn(e) {
-  const i = e.target.parentElement.parentElement.dataset.index;
-  console.log(i);
-  cardContainer.removeChild(document.querySelector(`[data-index= '${i}']`));
+  const bookTitle = `${e.target.dataset.title}`;
+  console.log(bookTitle);
+  const book = library.getBook(bookTitle);
+  console.log(book);
+  library.removeBook(bookTitle);
+  library.displayLibrary();
 }
 function submitBook(e) {
   const book = getBookFromInput();
-  addBookToLibrary();
-  displayBook(book);
-  const removeBtns = document.querySelectorAll("#remove");
-  console.log(removeBtns);
-  removeBtns.forEach((button) => button.addEventListener("click", removeBtn));
+  if (library.addBook(book)) { library.displayLibrary(); }
   removeActive();
   e.preventDefault();
 }
+const clearCards = () => {
+  cardContainer.innerHTML = "";
+};
 const hi = document.querySelector(`[data-index= '${1}']`);
 submitBtn.addEventListener("click", submitBook);
 addBookBtn.onclick = () => {
