@@ -5,21 +5,21 @@ const addBookBtn = document.querySelector("#bookBtn");
 const overlay = document.querySelector(".overlay");
 const form = document.querySelector("form");
 
-// book object
-function Book(title, author, pages, read) {
-  this.title = title;
-  this.author = author;
-  this.pages = pages;
-  this.read = read;
-  this.info = function () {
-    return title + author + pages + read;
-  };
-}
-Book.prototype.toggleRead = function () {
-  this.read = !this.read;
-};
-Book.prototype.displayBook = function () {
-  const div = document.createElement("div");
+class Book{
+  constructor(title, author, pages, read) {
+    this.title = title;
+    this.author = author;
+    this.pages = pages;
+    this.read = read;
+    this.info = function () {
+      return title + author + pages + read;
+    };
+  }
+  toggleRead(){
+    this.read = !this.read;
+  }
+  displayBook(){
+    const div = document.createElement("div");
   const title = document.createElement("div");
   const author = document.createElement("div");
   const pages = document.createElement("div");
@@ -53,33 +53,34 @@ Book.prototype.displayBook = function () {
   div.appendChild(button);
   button.appendChild(read);
   button.appendChild(remove);
-};
-
-function Library() {
-  this.books = [];
-}
-Library.prototype.getBook = function (bookTitle) {
-  return this.books.find((book) => book.title === bookTitle);
-};
-Library.prototype.addBook = function (newBook) {
-  if (this.inLibrary(newBook)) {
-    alert("already in library");
-    return false;
   }
-  this.books.push(newBook);
-  return true;
-};
-Library.prototype.removeBook = function (title) {
-  this.books = this.books.filter((book) => book.title !== title);
-  console.log(this.books);
-};
-Library.prototype.inLibrary = function (newBook) {
-  return this.books.some((book) => newBook.title === book.title);
-};
-Library.prototype.displayLibrary = function () {
-  clearCards();
-  this.books.forEach((book) => book.displayBook());
-};
+}
+
+class Library{
+  books = [];
+  getBook(bookTitle){
+    return this.books.find((book) => book.title === bookTitle);
+  }
+  addBook(newBook){
+    if (this.inLibrary(newBook)) {
+      alert("already in library");
+      return false;
+    }
+    this.books.push(newBook);
+    return true;
+  }
+  removeBook(title){
+    this.books = this.books.filter((book) => book.title !== title);
+    console.log(this.books);
+  }
+  inLibrary(newBook){
+    return this.books.some((book) => newBook.title === book.title);
+  }
+  displayLibrary(){
+    clearCards();
+    this.books.forEach((book) => book.displayBook());
+  }
+}
 
 const library = new Library();
 
